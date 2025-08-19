@@ -1,0 +1,206 @@
+@prefix fd: <http://example.org/financial-derivatives#> .
+@prefix ti: <http://ontologydesignpatterns.org/cp/owl/temporalindirection.owl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+<http://example.org/financial-derivatives> rdf:type owl:Ontology ;
+    owl:imports <http://ontologydesignpatterns.org/cp/owl/temporalindirection.owl> ;
+    dc:title "Financial Derivatives Ontology"@en ;
+    dc:description "Domain ontology for financial derivatives using temporal indirection pattern"@en .
+
+#################################################################
+#    Classes - Specializations of Pattern Classes
+#################################################################
+
+fd:GenericTicker rdfs:subClassOf ti:PersistentReference ;
+    rdfs:comment "A persistent market symbol that references changing futures contracts"@en .
+
+fd:FuturesContract rdfs:subClassOf ti:ReferentEntity ;
+    rdfs:comment "A specific dated futures contract"@en .
+
+fd:ContractMapping rdfs:subClassOf ti:TemporalBinding ;
+    rdfs:comment "Temporal binding between generic ticker and specific contract"@en .
+
+fd:ContractRoll rdfs:subClassOf ti:TransitionEvent ;
+    rdfs:comment "Transition event when generic ticker rolls to new contract"@en .
+
+fd:RollSchedule rdfs:subClassOf ti:ResolutionContext ;
+    rdfs:comment "Rules governing contract roll timing"@en .
+
+fd:ExchangeConvention rdfs:subClassOf ti:Convention ;
+    rdfs:comment "Exchange-specific trading conventions"@en .
+
+fd:RollRule rdfs:subClassOf ti:TransitionRule ;
+    rdfs:comment "Specific rule for contract rolling"@en .
+
+fd:PriceObservation rdfs:subClassOf ti:Observation ;
+    rdfs:comment "Price observation for a generic ticker"@en .
+
+fd:TradingPeriod rdfs:subClassOf ti:TemporalInterval ;
+    rdfs:comment "Trading period for a contract"@en .
+
+#################################################################
+#    Domain-Specific Classes
+#################################################################
+
+fd:Commodity rdf:type owl:Class ;
+    rdfs:comment "Underlying commodity for futures contracts"@en .
+
+fd:Exchange rdf:type owl:Class ;
+    rdfs:comment "Financial exchange where contracts trade"@en .
+
+fd:Spread rdf:type owl:Class ;
+    rdfs:comment "Price difference between related contracts"@en .
+
+fd:CalendarSpread rdfs:subClassOf fd:Spread ;
+    rdfs:comment "Spread between different months of same commodity"@en .
+
+fd:ContractMonth rdf:type owl:Class ;
+    rdfs:comment "Delivery month for a futures contract"@en .
+
+#################################################################
+#    Object Properties - Specialized
+#################################################################
+
+fd:hasUnderlying rdf:type owl:ObjectProperty ;
+    rdfs:domain fd:FuturesContract ;
+    rdfs:range fd:Commodity ;
+    rdfs:comment "Links contract to underlying commodity"@en .
+
+fd:tradedOn rdf:type owl:ObjectProperty ;
+    rdfs:domain [ owl:unionOf (fd:GenericTicker fd:FuturesContract) ] ;
+    rdfs:range fd:Exchange ;
+    rdfs:comment "Exchange where instrument trades"@en .
+
+fd:rollsFrom rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf ti:changes ;
+    rdfs:domain fd:ContractRoll ;
+    rdfs:range fd:FuturesContract ;
+    rdfs:comment "Outgoing contract in roll"@en .
+
+fd:rollsTo rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf ti:changes ;
+    rdfs:domain fd:ContractRoll ;
+    rdfs:range fd:FuturesContract ;
+    rdfs:comment "Incoming contract in roll"@en .
+
+fd:hasDeliveryMonth rdf:type owl:ObjectProperty ;
+    rdfs:domain fd:FuturesContract ;
+    rdfs:range fd:ContractMonth ;
+    rdfs:comment "Delivery month for contract"@en .
+
+fd:hasNearLeg rdf:type owl:ObjectProperty ;
+    rdfs:domain fd:CalendarSpread ;
+    rdfs:range fd:GenericTicker ;
+    rdfs:comment "Near-month leg of spread"@en .
+
+fd:hasFarLeg rdf:type owl:ObjectProperty ;
+    rdfs:domain fd:CalendarSpread ;
+    rdfs:range fd:GenericTicker ;
+    rdfs:comment "Far-month leg of spread"@en .
+
+fd:observedSpread rdf:type owl:ObjectProperty ;
+    rdfs:domain fd:PriceObservation ;
+    rdfs:range fd:Spread ;
+    rdfs:comment "Links observation to spread"@en .
+
+#################################################################
+#    Data Properties - Specialized
+#################################################################
+
+fd:hasTickerID rdf:type owl:DatatypeProperty ;
+    rdfs:domain fd:GenericTicker ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Ticker symbol (e.g., 'CL1')"@en .
+
+fd:hasContractID rdf:type owl:DatatypeProperty ;
+    rdfs:domain fd:FuturesContract ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Specific contract ID (e.g., 'CLH24')"@en .
+
+fd:hasExpirationDate rdf:type owl:DatatypeProperty ;
+    rdfs:domain fd:FuturesContract ;
+    rdfs:range xsd:date ;
+    rdfs:comment "Contract expiration date"@en .
+
+fd:hasRollDate rdf:type owl:DatatypeProperty ;
+    rdfs:domain fd:ContractRoll ;
+    rdfs:range xsd:dateTime ;
+    rdfs:comment "Date and time of roll"@en .
+
+fd:hasPrice rdf:type owl:DatatypeProperty ;
+    rdfs:domain fd:PriceObservation ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Observed price"@en .
+
+fd:hasVolume rdf:type owl:DatatypeProperty ;
+    rdfs:domain fd:PriceObservation ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Trading volume"@en .
+
+fd:hasSpreadValue rdf:type owl:DatatypeProperty ;
+    rdfs:domain fd:PriceObservation ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Spread value in price units"@en .
+
+fd:hasMonthCode rdf:type owl:DatatypeProperty ;
+    rdfs:domain fd:ContractMonth ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Month code (F=Jan, G=Feb, H=Mar...)"@en .
+
+fd:hasYear rdf:type owl:DatatypeProperty ;
+    rdfs:domain fd:ContractMonth ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Contract year"@en .
+
+fd:hasContractSize rdf:type owl:DatatypeProperty ;
+    rdfs:domain fd:FuturesContract ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Contract size in units"@en .
+
+fd:hasRollDays rdf:type owl:DatatypeProperty ;
+    rdfs:domain fd:RollRule ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Days before expiration to roll"@en .
+
+#################################################################
+#    Axioms
+#################################################################
+
+fd:GenericTicker rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty fd:hasTickerID ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+fd:FuturesContract rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty fd:hasContractID ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+fd:FuturesContract rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty fd:hasExpirationDate ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+fd:ContractRoll rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty fd:rollsFrom ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+fd:ContractRoll rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty fd:rollsTo ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+fd:CalendarSpread rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty fd:hasNearLeg ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+fd:CalendarSpread rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty fd:hasFarLeg ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .

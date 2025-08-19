@@ -1,0 +1,259 @@
+@prefix avo: <http://example.org/aviation-operations#> .
+@prefix ti: <http://ontologydesignpatterns.org/cp/owl/temporalindirection.owl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+<http://example.org/aviation-operations> rdf:type owl:Ontology ;
+    owl:imports <http://ontologydesignpatterns.org/cp/owl/temporalindirection.owl> ;
+    dc:title "Aviation Operations Ontology"@en ;
+    dc:description "Domain ontology for aviation operations using temporal indirection pattern"@en .
+
+#################################################################
+#    Classes - Specializations of Pattern Classes
+#################################################################
+
+avo:FlightNumber rdfs:subClassOf ti:PersistentReference ;
+    rdfs:comment "A persistent flight number that references changing aircraft and crews"@en .
+
+avo:FlightOperation rdfs:subClassOf ti:ReferentEntity ;
+    rdfs:comment "A specific flight operation with aircraft, crew, and route"@en .
+
+avo:FlightAssignment rdfs:subClassOf ti:TemporalBinding ;
+    rdfs:comment "Temporal binding between flight number and specific operation"@en .
+
+avo:FlightTransition rdfs:subClassOf ti:TransitionEvent ;
+    rdfs:comment "Transition event when flight number changes to new operation"@en .
+
+avo:FlightSchedule rdfs:subClassOf ti:ResolutionContext ;
+    rdfs:comment "Schedule governing flight number assignments"@en .
+
+avo:AirlineConvention rdfs:subClassOf ti:Convention ;
+    rdfs:comment "Airline-specific conventions for flight operations"@en .
+
+avo:SchedulingRule rdfs:subClassOf ti:TransitionRule ;
+    rdfs:comment "Rules for flight scheduling and transitions"@en .
+
+avo:FlightObservation rdfs:subClassOf ti:Observation ;
+    rdfs:comment "Observation about a flight (metrics, events, etc.)"@en .
+
+avo:FlightPeriod rdfs:subClassOf ti:TemporalInterval ;
+    rdfs:comment "Time period for a flight operation"@en .
+
+#################################################################
+#    Domain-Specific Classes
+#################################################################
+
+avo:Aircraft rdf:type owl:Class ;
+    rdfs:comment "Physical aircraft"@en .
+
+avo:Crew rdf:type owl:Class ;
+    rdfs:comment "Flight crew team"@en .
+
+avo:CrewMember rdf:type owl:Class ;
+    rdfs:comment "Individual crew member"@en .
+
+avo:Route rdf:type owl:Class ;
+    rdfs:comment "Flight route between airports"@en .
+
+avo:Airport rdf:type owl:Class ;
+    rdfs:comment "Airport location"@en .
+
+avo:Airline rdf:type owl:Class ;
+    rdfs:comment "Airline operator"@en .
+
+avo:MaintenanceEvent rdf:type owl:Class ;
+    rdfs:subClassOf avo:FlightObservation ;
+    rdfs:comment "Aircraft maintenance event"@en .
+
+avo:SafetyIncident rdf:type owl:Class ;
+    rdfs:subClassOf avo:FlightObservation ;
+    rdfs:comment "Safety-related incident"@en .
+
+avo:PerformanceMetric rdf:type owl:Class ;
+    rdfs:subClassOf avo:FlightObservation ;
+    rdfs:comment "Flight performance metric"@en .
+
+avo:CrewRole rdf:type owl:Class ;
+    rdfs:comment "Role in crew (captain, first officer, etc.)"@en .
+
+#################################################################
+#    Object Properties - Specialized
+#################################################################
+
+avo:hasAircraft rdf:type owl:ObjectProperty ;
+    rdfs:domain avo:FlightOperation ;
+    rdfs:range avo:Aircraft ;
+    rdfs:comment "Links flight operation to aircraft"@en .
+
+avo:hasCrew rdf:type owl:ObjectProperty ;
+    rdfs:domain avo:FlightOperation ;
+    rdfs:range avo:Crew ;
+    rdfs:comment "Links flight operation to crew"@en .
+
+avo:hasRoute rdf:type owl:ObjectProperty ;
+    rdfs:domain avo:FlightOperation ;
+    rdfs:range avo:Route ;
+    rdfs:comment "Links flight operation to route"@en .
+
+avo:operatedBy rdf:type owl:ObjectProperty ;
+    rdfs:domain avo:FlightNumber ;
+    rdfs:range avo:Airline ;
+    rdfs:comment "Airline operating the flight number"@en .
+
+avo:hasDepartureAirport rdf:type owl:ObjectProperty ;
+    rdfs:domain avo:Route ;
+    rdfs:range avo:Airport ;
+    rdfs:comment "Departure airport of route"@en .
+
+avo:hasArrivalAirport rdf:type owl:ObjectProperty ;
+    rdfs:domain avo:Route ;
+    rdfs:range avo:Airport ;
+    rdfs:comment "Arrival airport of route"@en .
+
+avo:hasMember rdf:type owl:ObjectProperty ;
+    rdfs:domain avo:Crew ;
+    rdfs:range avo:CrewMember ;
+    rdfs:comment "Member of crew"@en .
+
+avo:hasRole rdf:type owl:ObjectProperty ;
+    rdfs:domain avo:CrewMember ;
+    rdfs:range avo:CrewRole ;
+    rdfs:comment "Role of crew member"@en .
+
+avo:transitionsFrom rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf ti:changes ;
+    rdfs:domain avo:FlightTransition ;
+    rdfs:range avo:FlightOperation ;
+    rdfs:comment "Previous flight operation"@en .
+
+avo:transitionsTo rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf ti:changes ;
+    rdfs:domain avo:FlightTransition ;
+    rdfs:range avo:FlightOperation ;
+    rdfs:comment "Next flight operation"@en .
+
+avo:involvesAircraft rdf:type owl:ObjectProperty ;
+    rdfs:domain avo:MaintenanceEvent ;
+    rdfs:range avo:Aircraft ;
+    rdfs:comment "Aircraft involved in maintenance"@en .
+
+avo:reportedFor rdf:type owl:ObjectProperty ;
+    rdfs:domain avo:SafetyIncident ;
+    rdfs:range avo:FlightOperation ;
+    rdfs:comment "Flight operation with incident"@en .
+
+#################################################################
+#    Data Properties - Specialized
+#################################################################
+
+avo:hasFlightCode rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:FlightNumber ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Flight number code (e.g., 'UA001')"@en .
+
+avo:hasRegistration rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:Aircraft ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Aircraft registration number"@en .
+
+avo:hasAircraftType rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:Aircraft ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Aircraft type (e.g., 'Boeing 737-800')"@en .
+
+avo:hasScheduledDeparture rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:FlightOperation ;
+    rdfs:range xsd:dateTime ;
+    rdfs:comment "Scheduled departure time"@en .
+
+avo:hasActualDeparture rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:FlightOperation ;
+    rdfs:range xsd:dateTime ;
+    rdfs:comment "Actual departure time"@en .
+
+avo:hasScheduledArrival rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:FlightOperation ;
+    rdfs:range xsd:dateTime ;
+    rdfs:comment "Scheduled arrival time"@en .
+
+avo:hasActualArrival rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:FlightOperation ;
+    rdfs:range xsd:dateTime ;
+    rdfs:comment "Actual arrival time"@en .
+
+avo:hasPassengerCount rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:PerformanceMetric ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of passengers"@en .
+
+avo:hasOnTimePerformance rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:PerformanceMetric ;
+    rdfs:range xsd:boolean ;
+    rdfs:comment "Whether flight was on time"@en .
+
+avo:hasFuelConsumption rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:PerformanceMetric ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Fuel consumption in gallons"@en .
+
+avo:hasIncidentType rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:SafetyIncident ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Type of safety incident"@en .
+
+avo:hasSeverity rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:SafetyIncident ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Incident severity level"@en .
+
+avo:hasMaintenanceType rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:MaintenanceEvent ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Type of maintenance performed"@en .
+
+avo:hasCrewID rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:CrewMember ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Crew member ID"@en .
+
+avo:hasLicenseNumber rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:CrewMember ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Pilot license number"@en .
+
+avo:hasIATACode rdf:type owl:DatatypeProperty ;
+    rdfs:domain avo:Airport ;
+    rdfs:range xsd:string ;
+    rdfs:comment "IATA airport code"@en .
+
+#################################################################
+#    Axioms
+#################################################################
+
+avo:FlightNumber rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty avo:hasFlightCode ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+avo:Aircraft rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty avo:hasRegistration ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+avo:FlightOperation rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty avo:hasAircraft ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+avo:FlightOperation rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty avo:hasCrew ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+avo:FlightOperation rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty avo:hasRoute ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .

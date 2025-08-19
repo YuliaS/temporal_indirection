@@ -1,0 +1,166 @@
+@prefix : <http://ontologydesignpatterns.org/cp/owl/temporalindirection.owl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix cpannotationschema: <http://www.ontologydesignpatterns.org/schemas/cpannotationschema.owl#> .
+
+<http://ontologydesignpatterns.org/cp/owl/temporalindirection.owl> rdf:type owl:Ontology ;
+    dc:title "Temporal Indirection Pattern"@en ;
+    dc:description "An ontology design pattern for modeling persistent identifiers whose referents change over time according to defined rules."@en ;
+    dc:creator "Yulia Svetashova" ;
+    dcterms:created "2025-08-15"^^xsd:date ;
+    cpannotationschema:hasIntent "To model stable references to changing entities while tracking observations and maintaining historical perspective."@en ;
+    cpannotationschema:coversRequirements "What is the current referent? What was the historical referent? When did transitions occur?"@en .
+
+#################################################################
+#    Classes
+#################################################################
+
+:PersistentReference rdf:type owl:Class ;
+    rdfs:comment "A stable identifier that maintains its identity over time while referring to different entities"@en .
+
+:ReferentEntity rdf:type owl:Class ;
+    rdfs:comment "An entity that can be referenced by a persistent reference"@en .
+
+:TemporalBinding rdf:type owl:Class ;
+    rdfs:comment "A relationship linking a persistent reference to a referent entity for a specific time period"@en .
+
+:TransitionEvent rdf:type owl:Class ;
+    rdfs:comment "An event marking the change from one referent to another"@en .
+
+:ResolutionContext rdf:type owl:Class ;
+    rdfs:comment "The interpretive framework determining which referent is active at any given time"@en .
+
+:Convention rdf:type owl:Class ;
+    rdfs:comment "Domain-specific rules governing temporal indirection patterns"@en .
+
+:TransitionRule rdf:type owl:Class ;
+    rdfs:comment "A rule that triggers transitions between referents"@en .
+
+:Observation rdf:type owl:Class ;
+    rdfs:comment "An observation made about a persistent reference and its referent"@en .
+
+:TemporalInterval rdf:type owl:Class ;
+    rdfs:comment "A time interval with start and end times"@en .
+
+#################################################################
+#    Axioms
+#################################################################
+
+:TemporalBinding rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty :bindsTo ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+:TemporalBinding rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty :hasValidTime ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+:TransitionEvent rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty :hasTimestamp ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+:PersistentReference rdfs:subClassOf
+    [ rdf:type owl:Restriction ;
+      owl:onProperty :hasResolutionContext ;
+      owl:minCardinality "1"^^xsd:nonNegativeInteger ] .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+:bindsTo rdf:type owl:ObjectProperty ;
+    rdfs:domain :TemporalBinding ;
+    rdfs:range :ReferentEntity ;
+    rdfs:comment "Links a temporal binding to the referent entity it references"@en .
+
+:hasTemporalBinding rdf:type owl:ObjectProperty ;
+    rdfs:domain :PersistentReference ;
+    rdfs:range :TemporalBinding ;
+    rdfs:comment "Links a persistent reference to its temporal bindings"@en .
+
+:hasTransition rdf:type owl:ObjectProperty ;
+    rdfs:domain :ReferentEntity ;
+    rdfs:range :TransitionEvent ;
+    rdfs:comment "Links a referent entity to transition events involving it"@en .
+
+:hasTransitionIn rdf:type owl:ObjectProperty ;
+    rdfs:domain :TemporalBinding ;
+    rdfs:range :TransitionEvent ;
+    rdfs:comment "The transition event that initiated this binding"@en .
+
+:hasTransitionOut rdf:type owl:ObjectProperty ;
+    rdfs:domain :TemporalBinding ;
+    rdfs:range :TransitionEvent ;
+    rdfs:comment "The transition event that terminated this binding"@en .
+
+:hasResolutionContext rdf:type owl:ObjectProperty ;
+    rdfs:domain :PersistentReference ;
+    rdfs:range :ResolutionContext ;
+    rdfs:comment "Links a persistent reference to its governing resolution context"@en .
+
+:follows rdf:type owl:ObjectProperty ;
+    rdfs:domain :ResolutionContext ;
+    rdfs:range :Convention ;
+    rdfs:comment "Links a resolution context to the convention it follows"@en .
+
+:defines rdf:type owl:ObjectProperty ;
+    rdfs:domain :ResolutionContext ;
+    rdfs:range :TransitionRule ;
+    rdfs:comment "Links a resolution context to the transition rules it defines"@en .
+
+:triggeredBy rdf:type owl:ObjectProperty ;
+    rdfs:domain :TransitionEvent ;
+    rdfs:range :TransitionRule ;
+    rdfs:comment "Links a transition event to the rule that triggered it"@en .
+
+:observedEntity rdf:type owl:ObjectProperty ;
+    rdfs:domain :Observation ;
+    rdfs:range :PersistentReference ;
+    rdfs:comment "Links an observation to the persistent reference being observed"@en .
+
+:observedReferentEntity rdf:type owl:ObjectProperty ;
+    rdfs:domain :Observation ;
+    rdfs:range :ReferentEntity ;
+    rdfs:comment "Links an observation to the specific referent entity at observation time"@en .
+
+:hasValidTime rdf:type owl:ObjectProperty ;
+    rdfs:domain :TemporalBinding ;
+    rdfs:range :TemporalInterval ;
+    rdfs:comment "The time interval during which a temporal binding is valid"@en .
+
+:changes rdf:type owl:ObjectProperty ;
+    rdfs:domain :TransitionEvent ;
+    rdfs:range :ReferentEntity ;
+    rdfs:comment "Links a transition event to the entities involved in the change"@en .
+
+#################################################################
+#    Data Properties
+#################################################################
+
+:hasTimestamp rdf:type owl:DatatypeProperty ;
+    rdfs:domain :TransitionEvent ;
+    rdfs:range xsd:dateTime ;
+    rdfs:comment "The timestamp when a transition occurred"@en .
+
+:hasStartTime rdf:type owl:DatatypeProperty ;
+    rdfs:domain :TemporalInterval ;
+    rdfs:range xsd:dateTime ;
+    rdfs:comment "Start time of a temporal interval"@en .
+
+:hasEndTime rdf:type owl:DatatypeProperty ;
+    rdfs:domain :TemporalInterval ;
+    rdfs:range xsd:dateTime ;
+    rdfs:comment "End time of a temporal interval"@en .
+
+:hasObservationTime rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Observation ;
+    rdfs:range xsd:dateTime ;
+    rdfs:comment "The time when an observation was made"@en .
+

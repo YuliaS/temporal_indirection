@@ -1,0 +1,235 @@
+@prefix ex: <http://example.org/financial-derivatives/instances#> .
+@prefix fd: <http://example.org/financial-derivatives#> .
+@prefix ti: <http://ontologydesignpatterns.org/cp/owl/temporalindirection.owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+#################################################################
+#    Infrastructure
+#################################################################
+
+ex:NYMEX a fd:Exchange ;
+    rdfs:label "New York Mercantile Exchange" .
+
+ex:CrudeOilWTI a fd:Commodity ;
+    rdfs:label "West Texas Intermediate Crude Oil" .
+
+#################################################################
+#    Generic Tickers
+#################################################################
+
+ex:CL1 a fd:GenericTicker ;
+    fd:hasTickerID "CL1" ;
+    rdfs:label "WTI Crude Oil Front Month" ;
+    fd:tradedOn ex:NYMEX ;
+    ti:hasResolutionContext ex:CL_RollSchedule .
+
+ex:CL2 a fd:GenericTicker ;
+    fd:hasTickerID "CL2" ;
+    rdfs:label "WTI Crude Oil Second Month" ;
+    fd:tradedOn ex:NYMEX ;
+    ti:hasResolutionContext ex:CL_RollSchedule .
+
+#################################################################
+#    Contract Months
+#################################################################
+
+ex:July2025 a fd:ContractMonth ;
+    fd:hasMonthCode "N" ;
+    fd:hasYear 2025 .
+
+ex:August2025 a fd:ContractMonth ;
+    fd:hasMonthCode "Q" ;
+    fd:hasYear 2025 .
+
+ex:September2025 a fd:ContractMonth ;
+    fd:hasMonthCode "U" ;
+    fd:hasYear 2025 .
+
+ex:October2025 a fd:ContractMonth ;
+    fd:hasMonthCode "V" ;
+    fd:hasYear 2025 .
+
+#################################################################
+#    Futures Contracts
+#################################################################
+
+ex:CLN25 a fd:FuturesContract ;
+    fd:hasContractID "CLN25" ;
+    rdfs:label "July 2025 WTI Crude" ;
+    fd:hasExpirationDate "2025-06-20"^^xsd:date ;
+    fd:hasUnderlying ex:CrudeOilWTI ;
+    fd:hasDeliveryMonth ex:July2025 ;
+    fd:hasContractSize 1000 ;
+    fd:tradedOn ex:NYMEX .
+
+ex:CLQ25 a fd:FuturesContract ;
+    fd:hasContractID "CLQ25" ;
+    rdfs:label "August 2025 WTI Crude" ;
+    fd:hasExpirationDate "2025-07-22"^^xsd:date ;
+    fd:hasUnderlying ex:CrudeOilWTI ;
+    fd:hasDeliveryMonth ex:August2025 ;
+    fd:hasContractSize 1000 ;
+    fd:tradedOn ex:NYMEX .
+
+ex:CLU25 a fd:FuturesContract ;
+    fd:hasContractID "CLU25" ;
+    rdfs:label "September 2025 WTI Crude" ;
+    fd:hasExpirationDate "2025-08-20"^^xsd:date ;
+    fd:hasUnderlying ex:CrudeOilWTI ;
+    fd:hasDeliveryMonth ex:September2025 ;
+    fd:hasContractSize 1000 ;
+    fd:tradedOn ex:NYMEX .
+
+ex:CLV25 a fd:FuturesContract ;
+    fd:hasContractID "CLV25" ;
+    rdfs:label "October 2025 WTI Crude" ;
+    fd:hasExpirationDate "2025-09-19"^^xsd:date ;
+    fd:hasUnderlying ex:CrudeOilWTI ;
+    fd:hasDeliveryMonth ex:October2025 ;
+    fd:hasContractSize 1000 ;
+    fd:tradedOn ex:NYMEX .
+
+#################################################################
+#    Temporal Intervals
+#################################################################
+
+ex:July2025Period a fd:TradingPeriod ;
+    ti:hasStartTime "2025-06-15T15:00:00Z"^^xsd:dateTime ;
+    ti:hasEndTime "2025-07-15T15:00:00Z"^^xsd:dateTime .
+
+ex:August2025Period a fd:TradingPeriod ;
+    ti:hasStartTime "2025-07-15T15:00:00Z"^^xsd:dateTime ;
+    ti:hasEndTime "2025-08-15T15:00:00Z"^^xsd:dateTime .
+
+ex:September2025Period a fd:TradingPeriod ;
+    ti:hasStartTime "2025-08-15T15:00:00Z"^^xsd:dateTime ;
+    ti:hasEndTime "2025-09-15T15:00:00Z"^^xsd:dateTime .
+
+#################################################################
+#    Contract Mappings for CL1
+#################################################################
+
+ex:CL1_July_Mapping a fd:ContractMapping ;
+    ti:bindsTo ex:CLN25 ;
+    ti:hasValidTime ex:July2025Period ;
+    ti:hasTransitionOut ex:Roll_CL1_July_to_August .
+
+ex:CL1_August_Mapping a fd:ContractMapping ;
+    ti:bindsTo ex:CLQ25 ;
+    ti:hasValidTime ex:August2025Period ;
+    ti:hasTransitionIn ex:Roll_CL1_July_to_August ;
+    ti:hasTransitionOut ex:Roll_CL1_August_to_September .
+
+ex:CL1_September_Mapping a fd:ContractMapping ;
+    ti:bindsTo ex:CLU25 ;
+    ti:hasValidTime ex:September2025Period ;
+    ti:hasTransitionIn ex:Roll_CL1_August_to_September .
+
+ex:CL1 ti:hasTemporalBinding ex:CL1_July_Mapping ;
+      ti:hasTemporalBinding ex:CL1_August_Mapping ;
+      ti:hasTemporalBinding ex:CL1_September_Mapping .
+
+#################################################################
+#    Contract Mappings for CL2
+#################################################################
+
+ex:CL2_July_Mapping a fd:ContractMapping ;
+    ti:bindsTo ex:CLQ25 ;
+    ti:hasValidTime ex:July2025Period .
+
+ex:CL2_August_Mapping a fd:ContractMapping ;
+    ti:bindsTo ex:CLU25 ;
+    ti:hasValidTime ex:August2025Period .
+
+ex:CL2_September_Mapping a fd:ContractMapping ;
+    ti:bindsTo ex:CLV25 ;
+    ti:hasValidTime ex:September2025Period .
+
+ex:CL2 ti:hasTemporalBinding ex:CL2_July_Mapping ;
+      ti:hasTemporalBinding ex:CL2_August_Mapping ;
+      ti:hasTemporalBinding ex:CL2_September_Mapping .
+
+#################################################################
+#    Contract Roll Events
+#################################################################
+
+ex:Roll_CL1_July_to_August a fd:ContractRoll ;
+    fd:rollsFrom ex:CLN25 ;
+    fd:rollsTo ex:CLQ25 ;
+    fd:hasRollDate "2025-07-15T15:00:00Z"^^xsd:dateTime ;
+    ti:hasTimestamp "2025-07-15T15:00:00Z"^^xsd:dateTime ;
+    ti:triggeredBy ex:CL_RollRule .
+
+ex:Roll_CL1_August_to_September a fd:ContractRoll ;
+    fd:rollsFrom ex:CLQ25 ;
+    fd:rollsTo ex:CLU25 ;
+    fd:hasRollDate "2025-08-15T15:00:00Z"^^xsd:dateTime ;
+    ti:hasTimestamp "2025-08-15T15:00:00Z"^^xsd:dateTime ;
+    ti:triggeredBy ex:CL_RollRule .
+
+#################################################################
+#    Roll Schedule and Rules
+#################################################################
+
+ex:CL_RollSchedule a fd:RollSchedule ;
+    rdfs:label "NYMEX Crude Oil Roll Schedule" ;
+    ti:follows ex:NYMEX_Convention ;
+    ti:defines ex:CL_RollRule .
+
+ex:CL_RollRule a fd:RollRule ;
+    rdfs:label "CL Roll Rule" ;
+    rdfs:comment "Roll on 9th business day before 25th of month preceding delivery" ;
+    fd:hasRollDays 9 .
+
+ex:NYMEX_Convention a fd:ExchangeConvention ;
+    rdfs:label "NYMEX WTI Trading Convention" .
+
+#################################################################
+#    Price Observations
+#################################################################
+
+ex:PriceObs_CL1_20250814 a fd:PriceObservation ;
+    ti:observedEntity ex:CL1 ;
+    ti:observedReferent ex:CLU25 ;
+    fd:hasPrice "63.00"^^xsd:decimal ;
+    fd:hasVolume 43150 ;
+    ti:hasObservationTime "2025-08-14T07:51:00Z"^^xsd:dateTime .
+
+ex:PriceObs_CL1_20250714 a fd:PriceObservation ;
+    ti:observedEntity ex:CL1 ;
+    ti:observedReferent ex:CLN25 ;
+    fd:hasPrice "65.50"^^xsd:decimal ;
+    fd:hasVolume 52000 ;
+    ti:hasObservationTime "2025-07-14T12:00:00Z"^^xsd:dateTime .
+
+ex:PriceObs_CL2_20250814 a fd:PriceObservation ;
+    ti:observedEntity ex:CL2 ;
+    ti:observedReferent ex:CLV25 ;
+    fd:hasPrice "63.50"^^xsd:decimal ;
+    fd:hasVolume 28000 ;
+    ti:hasObservationTime "2025-08-14T07:51:00Z"^^xsd:dateTime .
+
+#################################################################
+#    Calendar Spreads
+#################################################################
+
+ex:CL1_CL2_Spread a fd:CalendarSpread ;
+    rdfs:label "CL1-CL2 Calendar Spread" ;
+    fd:hasNearLeg ex:CL1 ;
+    fd:hasFarLeg ex:CL2 .
+
+ex:SpreadObs_20250814 a fd:PriceObservation ;
+    fd:observedSpread ex:CL1_CL2_Spread ;
+    fd:hasSpreadValue "-0.50"^^xsd:decimal ;
+    ti:hasObservationTime "2025-08-14T07:51:00Z"^^xsd:dateTime ;
+    rdfs:comment "CL1 trading 0.50 below CL2" .
+
+#################################################################
+#    Transition Events for Referent Entities
+#################################################################
+
+ex:CLN25 ti:hasTransition ex:Roll_CL1_July_to_August .
+ex:CLQ25 ti:hasTransition ex:Roll_CL1_July_to_August ;
+         ti:hasTransition ex:Roll_CL1_August_to_September .
+ex:CLU25 ti:hasTransition ex:Roll_CL1_August_to_September .

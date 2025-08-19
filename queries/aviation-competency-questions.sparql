@@ -1,0 +1,137 @@
+# Competency Questions for Aviation Temporal Indirection Pattern
+
+PREFIX avo: <http://example.org/aviation-operations#>
+PREFIX ti: <http://ontologydesignpatterns.org/cp/owl/temporalindirection.owl#>
+PREFIX ex: <http://example.org/aviation-operations/instances#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+# CQ1: What is the current aircraft and crew for flight UA001?
+# Expected: N54321 aircraft with Captain Smith and FO Wilson on 2024-08-16
+SELECT ?aircraft ?registration ?captain WHERE {
+    ex:UA001 ti:hasTemporalBinding ?binding .
+    ?binding ti:bindsTo ?operation ;
+             ti:hasValidTime ?period .
+    ?period ti:hasStartTime ?start ;
+            ti:hasEndTime ?end .
+    FILTER("2024-08-16T12:00:00Z"^^xsd:dateTime >= ?start && 
+           "2024-08-16T12:00:00Z"^^xsd:dateTime <= ?end)
+    ?operation avo:hasAircraft ?aircraft ;
+               avo:hasCrew ?crew .
+    ?aircraft avo:hasRegistration ?registration .
+    ?crew avo:hasMember ?captain .
+    ?captain avo:hasRole ex:CaptainRole .
+}
+
+# CQ2: What aircraft operated UA001 on a specific date?
+# Expected: N12345 on 2024-08-14
+SELECT ?aircraft ?registration ?operation WHERE {
+    ex:UA001 ti:hasTemporalBinding ?binding .
+    ?binding ti:bindsTo ?operation ;
+             ti:hasValidTime ?period .
+    ?period ti:hasStartTime ?start ;
+            ti:hasEndTime ?end .
+    FILTER("2024-08-14T12:00:00Z"^^xsd:dateTime >= ?start && 
+           "2024-08-14T12:00:00Z"^^xsd:dateTime <= ?end)
+    ?operation avo:hasAircraft ?aircraft .
+    ?aircraft avo:hasRegistration ?registration .
+}
+
+# CQ3: When did aircraft transitions occur for UA001?
+# Expected: Transitions at midnight on Aug 15 and Aug 16
+SELECT ?timestamp ?fromAircraft ?toAircraft WHERE {
+    ?transition a avo:FlightTransition ;
+                ti:hasTimestamp ?timestamp ;
+                avo:transitionsFrom ?fromOp ;
+                avo:transitionsTo ?toOp .
+    ?fromOp avo:hasAircraft ?fromAircraft .
+    ?toOp avo:hasAircraft ?toAircraft .
+}
+ORDER BY ?timestamp
+
+# CQ4: What performance metrics are associated with specific aircraft?
+# Expected: Metrics for N12345 including passenger count and fuel
+SELECT ?aircraft ?passengers ?fuel ?onTime WHERE {
+    ?metric a avo:PerformanceMetric ;
+            ti:observedReferent ?operation ;
+            avo:hasPassengerCount ?passengers ;
+            avo:hasFuelConsumption ?fuel ;
+            avo:hasOnTimePerformance ?onTime .
+    ?operation avo:hasAircraft ?aircraft .
+    FILTER(?aircraft = ex:Aircraft_N12345)
+}
+
+# CQ5: Complete history of aircraft assignments for UA001
+# Expected: N12345, N67890, N54321 in chronological order
+SELECT ?operation ?aircraft ?date WHERE {
+    ex:UA001 ti:hasTemporalBinding ?binding .
+    ?binding ti:bindsTo ?operation ;
+             ti:hasValidTime ?period .
+    ?period ti:hasStartTime ?date .
+    ?operation avo:hasAircraft ?aircraft .
+}
+ORDER BY ?date
+
+# CQ6: What scheduling rule governs UA001 transitions?
+# Expected: DailyScheduleRule
+SELECT ?rule ?description WHERE {
+    ?transition a avo:FlightTransition ;
+                ti:triggeredBy ?rule .
+    OPTIONAL { ?rule rdfs:comment ?description }
+}
+LIMIT 1
+
+# CQ7: Check for temporal gaps or overlaps in flight assignments
+# Should return empty if no overlaps exist
+SELECT ?flight ?period1 ?period2 WHERE {
+    ?flight ti:hasTemporalBinding ?binding1 ;
+            ti:hasTemporalBinding ?binding2 .
+    FILTER(?binding1 != ?binding2)
+    ?binding1 ti:hasValidTime ?period1 .
+    ?binding2 ti:hasValidTime ?period2 .
+    ?period1 ti:hasStartTime ?start1 ; ti:hasEndTime ?end1 .
+    ?period2 ti:hasStartTime ?start2 ; ti:hasEndTime ?end2 .
+    FILTER(?start2 < ?end1 && ?start1 < ?end2)
+}
+
+# CQ8: Safety investigation - reconstruct complete operational context
+# For incident on 2024-08-14, get aircraft, crew, and metrics
+SELECT ?incident ?aircraft ?captain ?passengers ?severity WHERE {
+    ?incident a avo:SafetyIncident ;
+              avo:reportedFor ?operation ;
+              avo:hasSeverity ?severity .
+    ?operation avo:hasAircraft ?aircraft ;
+               avo:hasCrew ?crew .
+    ?crew avo:hasMember ?captain .
+    ?captain avo:hasRole ex:CaptainRole .
+    OPTIONAL {
+        ?metric ti:observedReferent ?operation ;
+                avo:hasPassengerCount ?passengers .
+    }
+}
+
+# CQ9: Maintenance history for aircraft involved in operations
+# Get maintenance events for aircraft used by UA001
+SELECT DISTINCT ?aircraft ?maintType ?maintTime WHERE {
+    ex:UA001 ti:hasTemporalBinding/ti:bindsTo ?operation .
+    ?operation avo:hasAircraft ?aircraft .
+    ?maint avo:involvesAircraft ?aircraft ;
+           avo:hasMaintenanceType ?maintType ;
+           ti:hasObservationTime ?maintTime .
+}
+ORDER BY ?aircraft ?maintTime
+
+# CQ10: Crew rotation patterns across flights
+# Track which crews worked which flights
+SELECT ?date ?captain ?firstOfficer WHERE {
+    ex:UA001 ti:hasTemporalBinding ?binding .
+    ?binding ti:bindsTo ?operation ;
+             ti:hasValidTime ?period .
+    ?period ti:hasStartTime ?date .
+    ?operation avo:hasCrew ?crew .
+    ?crew avo:hasMember ?captain ;
+          avo:hasMember ?firstOfficer .
+    ?captain avo:hasRole ex:CaptainRole .
+    ?firstOfficer avo:hasRole ex:FirstOfficerRole .
+}
+ORDER BY ?date

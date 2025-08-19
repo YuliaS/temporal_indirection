@@ -1,0 +1,64 @@
+@prefix : <http://ontologydesignpatterns.org/cp/owl/temporalindirection-dul.owl#> .
+@prefix dul: <http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+<http://ontologydesignpatterns.org/cp/owl/temporalindirection-dul.owl> rdf:type owl:Ontology ;
+    owl:imports <http://www.ontologydesignpatterns.org/ont/dul/DUL.owl> ;
+    dc:title "Temporal Indirection Pattern (DUL-aligned)"@en ;
+    dc:description "Temporal Indirection Pattern aligned with DOLCE+DnS Ultralite"@en .
+
+#################################################################
+#    Classes aligned with DUL
+#################################################################
+
+:PersistentReference rdfs:subClassOf dul:InformationObject ;
+    rdfs:comment "A stable identifier as an information object"@en .
+
+:ReferentEntity rdfs:subClassOf dul:Entity ;
+    rdfs:comment "An entity that can be referenced"@en .
+
+:TemporalBinding rdfs:subClassOf dul:Situation ;
+    rdfs:comment "A situation representing temporal binding"@en .
+
+:TransitionEvent rdfs:subClassOf dul:Event ;
+    rdfs:comment "An event marking referent transition"@en .
+
+:ResolutionContext rdfs:subClassOf dul:Description ;
+    rdfs:comment "A description providing resolution rules"@en .
+
+:Convention rdfs:subClassOf dul:Norm ;
+    rdfs:comment "Normative convention for transitions"@en .
+
+:TransitionRule rdfs:subClassOf dul:Description ;
+    rdfs:comment "Rule description for transitions"@en .
+
+:Observation rdfs:subClassOf dul:Event ;
+    rdfs:comment "An observation with temporal context"@en .
+
+:TemporalInterval rdfs:subClassOf dul:TimeInterval ;
+    rdfs:comment "A time interval"@en .
+
+# Reuse all properties from base pattern
+@prefix base: <http://ontologydesignpatterns.org/cp/owl/temporalindirection.owl#> .
+
+:bindsTo owl:equivalentProperty base:bindsTo .
+:hasTemporalBinding owl:equivalentProperty base:hasTemporalBinding .
+:hasTransition owl:equivalentProperty base:hasTransition .
+:hasTransitionIn owl:equivalentProperty base:hasTransitionIn .
+:hasTransitionOut owl:equivalentProperty base:hasTransitionOut .
+:hasResolutionContext owl:equivalentProperty base:hasResolutionContext .
+:follows owl:equivalentProperty base:follows .
+:defines owl:equivalentProperty base:defines .
+:triggeredBy owl:equivalentProperty base:triggeredBy .
+:observedEntity owl:equivalentProperty base:observedEntity .
+:observedReferent owl:equivalentProperty base:observedReferent .
+:hasValidTime owl:equivalentProperty base:hasValidTime .
+:changes owl:equivalentProperty base:changes .
+:hasTimestamp owl:equivalentProperty base:hasTimestamp .
+:hasStartTime owl:equivalentProperty base:hasStartTime .
+:hasEndTime owl:equivalentProperty base:hasEndTime .
+:hasObservationTime owl:equivalentProperty base:hasObservationTime .

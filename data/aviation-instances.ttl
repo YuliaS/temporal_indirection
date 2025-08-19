@@ -1,0 +1,275 @@
+@prefix ex: <http://example.org/aviation-operations/instances#> .
+@prefix avo: <http://example.org/aviation-operations#> .
+@prefix ti: <http://ontologydesignpatterns.org/cp/owl/temporalindirection.owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+#################################################################
+#    Infrastructure
+#################################################################
+
+ex:UnitedAirlines a avo:Airline ;
+    rdfs:label "United Airlines" .
+
+ex:SFO a avo:Airport ;
+    avo:hasIATACode "SFO" ;
+    rdfs:label "San Francisco International Airport" .
+
+ex:SIN a avo:Airport ;
+    avo:hasIATACode "SIN" ;
+    rdfs:label "Singapore Changi" .
+
+ex:Route_SFO_SIN a avo:Route ;
+    avo:hasDepartureAirport ex:SFO ;
+    avo:hasArrivalAirport ex:SIN ;
+    rdfs:label "San Francisco to Singapore" .
+
+#################################################################
+#    Flight Number (Persistent Reference)
+#################################################################
+
+ex:UA001 a avo:FlightNumber ;
+    avo:hasFlightCode "UA001" ;
+    avo:operatedBy ex:UnitedAirlines ;
+    ti:hasResolutionContext ex:UA_Schedule ;
+    rdfs:label "United Airlines Flight 001" .
+
+#################################################################
+#    Aircraft (Potential Referents)
+#################################################################
+
+ex:Aircraft_N12345 a avo:Aircraft ;
+    avo:hasRegistration "N12345" ;
+    avo:hasAircraftType "Boeing 737-800" ;
+    rdfs:label "Boeing 737-800 (N12345)" .
+
+ex:Aircraft_N67890 a avo:Aircraft ;
+    avo:hasRegistration "N67890" ;
+    avo:hasAircraftType "Boeing 737-900" ;
+    rdfs:label "Boeing 737-900 (N67890)" .
+
+ex:Aircraft_N54321 a avo:Aircraft ;
+    avo:hasRegistration "N54321" ;
+    avo:hasAircraftType "Boeing 737-MAX" ;
+    rdfs:label "Boeing 737-MAX (N54321)" .
+
+#################################################################
+#    Crew Members and Crews
+#################################################################
+
+ex:Captain_Smith a avo:CrewMember ;
+    avo:hasCrewID "UA-CPT-001" ;
+    avo:hasLicenseNumber "ATP-123456" ;
+    avo:hasRole ex:CaptainRole ;
+    rdfs:label "Captain Smith" .
+
+ex:FO_Johnson a avo:CrewMember ;
+    avo:hasCrewID "UA-FO-002" ;
+    avo:hasLicenseNumber "CPL-789012" ;
+    avo:hasRole ex:FirstOfficerRole ;
+    rdfs:label "First Officer Johnson" .
+
+ex:Captain_Davis a avo:CrewMember ;
+    avo:hasCrewID "UA-CPT-003" ;
+    avo:hasLicenseNumber "ATP-345678" ;
+    avo:hasRole ex:CaptainRole ;
+    rdfs:label "Captain Davis" .
+
+ex:FO_Wilson a avo:CrewMember ;
+    avo:hasCrewID "UA-FO-004" ;
+    avo:hasLicenseNumber "CPL-901234" ;
+    avo:hasRole ex:FirstOfficerRole ;
+    rdfs:label "First Officer Wilson" .
+
+ex:CaptainRole a avo:CrewRole ;
+    rdfs:label "Captain" .
+
+ex:FirstOfficerRole a avo:CrewRole ;
+    rdfs:label "First Officer" .
+
+ex:Crew_20240814 a avo:Crew ;
+    avo:hasMember ex:Captain_Smith ;
+    avo:hasMember ex:FO_Johnson ;
+    rdfs:label "Crew for Aug 14, 2024" .
+
+ex:Crew_20240815 a avo:Crew ;
+    avo:hasMember ex:Captain_Davis ;
+    avo:hasMember ex:FO_Wilson ;
+    rdfs:label "Crew for Aug 15, 2024" .
+
+ex:Crew_20240816 a avo:Crew ;
+    avo:hasMember ex:Captain_Smith ;
+    avo:hasMember ex:FO_Wilson ;
+    rdfs:label "Crew for Aug 16, 2024" .
+
+#################################################################
+#    Flight Operations (Referent Entities)
+#################################################################
+
+ex:UA001_Op_20240814 a avo:FlightOperation ;
+    avo:hasAircraft ex:Aircraft_N12345 ;
+    avo:hasCrew ex:Crew_20240814 ;
+    avo:hasRoute ex:Route_SFO_SIN ;
+    avo:hasScheduledDeparture "2024-08-14T08:00:00Z"^^xsd:dateTime ;
+    avo:hasActualDeparture "2024-08-14T08:15:00Z"^^xsd:dateTime ;
+    avo:hasScheduledArrival "2024-08-14T10:30:00Z"^^xsd:dateTime ;
+    avo:hasActualArrival "2024-08-14T10:45:00Z"^^xsd:dateTime ;
+    rdfs:label "UA001 Operation on Aug 14, 2024" .
+
+ex:UA001_Op_20240815 a avo:FlightOperation ;
+    avo:hasAircraft ex:Aircraft_N67890 ;
+    avo:hasCrew ex:Crew_20240815 ;
+    avo:hasRoute ex:Route_SFO_SIN ;
+    avo:hasScheduledDeparture "2024-08-15T08:00:00Z"^^xsd:dateTime ;
+    avo:hasActualDeparture "2024-08-15T08:05:00Z"^^xsd:dateTime ;
+    avo:hasScheduledArrival "2024-08-15T10:30:00Z"^^xsd:dateTime ;
+    avo:hasActualArrival "2024-08-15T10:35:00Z"^^xsd:dateTime ;
+    rdfs:label "UA001 Operation on Aug 15, 2024" .
+
+ex:UA001_Op_20240816 a avo:FlightOperation ;
+    avo:hasAircraft ex:Aircraft_N54321 ;
+    avo:hasCrew ex:Crew_20240816 ;
+    avo:hasRoute ex:Route_SFO_SIN ;
+    avo:hasScheduledDeparture "2024-08-16T08:00:00Z"^^xsd:dateTime ;
+    avo:hasActualDeparture "2024-08-16T08:00:00Z"^^xsd:dateTime ;
+    avo:hasScheduledArrival "2024-08-16T10:30:00Z"^^xsd:dateTime ;
+    avo:hasActualArrival "2024-08-16T10:25:00Z"^^xsd:dateTime ;
+    rdfs:label "UA001 Operation on Aug 16, 2024" .
+
+#################################################################
+#    Temporal Periods
+#################################################################
+
+ex:Period_20240814 a avo:FlightPeriod ;
+    ti:hasStartTime "2024-08-14T00:00:00Z"^^xsd:dateTime ;
+    ti:hasEndTime "2024-08-14T23:59:59Z"^^xsd:dateTime .
+
+ex:Period_20240815 a avo:FlightPeriod ;
+    ti:hasStartTime "2024-08-15T00:00:00Z"^^xsd:dateTime ;
+    ti:hasEndTime "2024-08-15T23:59:59Z"^^xsd:dateTime .
+
+ex:Period_20240816 a avo:FlightPeriod ;
+    ti:hasStartTime "2024-08-16T00:00:00Z"^^xsd:dateTime ;
+    ti:hasEndTime "2024-08-16T23:59:59Z"^^xsd:dateTime .
+
+#################################################################
+#    Flight Assignments (Temporal Bindings)
+#################################################################
+
+ex:UA001_Assignment_20240814 a avo:FlightAssignment ;
+    ti:bindsTo ex:UA001_Op_20240814 ;
+    ti:hasValidTime ex:Period_20240814 ;
+    ti:hasTransitionOut ex:Transition_20240814_to_20240815 .
+
+ex:UA001_Assignment_20240815 a avo:FlightAssignment ;
+    ti:bindsTo ex:UA001_Op_20240815 ;
+    ti:hasValidTime ex:Period_20240815 ;
+    ti:hasTransitionIn ex:Transition_20240814_to_20240815 ;
+    ti:hasTransitionOut ex:Transition_20240815_to_20240816 .
+
+ex:UA001_Assignment_20240816 a avo:FlightAssignment ;
+    ti:bindsTo ex:UA001_Op_20240816 ;
+    ti:hasValidTime ex:Period_20240816 ;
+    ti:hasTransitionIn ex:Transition_20240815_to_20240816 .
+
+ex:UA001 ti:hasTemporalBinding ex:UA001_Assignment_20240814 ;
+        ti:hasTemporalBinding ex:UA001_Assignment_20240815 ;
+        ti:hasTemporalBinding ex:UA001_Assignment_20240816 .
+
+#################################################################
+#    Flight Transitions
+#################################################################
+
+ex:Transition_20240814_to_20240815 a avo:FlightTransition ;
+    avo:transitionsFrom ex:UA001_Op_20240814 ;
+    avo:transitionsTo ex:UA001_Op_20240815 ;
+    ti:hasTimestamp "2024-08-15T00:00:00Z"^^xsd:dateTime ;
+    ti:triggeredBy ex:DailyScheduleRule .
+
+ex:Transition_20240815_to_20240816 a avo:FlightTransition ;
+    avo:transitionsFrom ex:UA001_Op_20240815 ;
+    avo:transitionsTo ex:UA001_Op_20240816 ;
+    ti:hasTimestamp "2024-08-16T00:00:00Z"^^xsd:dateTime ;
+    ti:triggeredBy ex:DailyScheduleRule .
+
+#################################################################
+#    Schedule and Rules
+#################################################################
+
+ex:UA_Schedule a avo:FlightSchedule ;
+    ti:follows ex:UA_Convention ;
+    ti:defines ex:DailyScheduleRule ;
+    rdfs:label "United Airlines Flight Schedule" .
+
+ex:DailyScheduleRule a avo:SchedulingRule ;
+    rdfs:label "Daily flight assignment rule" ;
+    rdfs:comment "Assigns new aircraft and crew daily" .
+
+ex:UA_Convention a avo:AirlineConvention ;
+    rdfs:label "United Airlines Operating Convention" .
+
+#################################################################
+#    Performance Metrics
+#################################################################
+
+ex:Metric_UA001_20240814 a avo:PerformanceMetric ;
+    ti:observedEntity ex:UA001 ;
+    ti:observedReferent ex:UA001_Op_20240814 ;
+    avo:hasPassengerCount 180 ;
+    avo:hasOnTimePerformance false ;
+    avo:hasFuelConsumption "2850.5"^^xsd:decimal ;
+    ti:hasObservationTime "2024-08-14T10:45:00Z"^^xsd:dateTime .
+
+ex:Metric_UA001_20240815 a avo:PerformanceMetric ;
+    ti:observedEntity ex:UA001 ;
+    ti:observedReferent ex:UA001_Op_20240815 ;
+    avo:hasPassengerCount 195 ;
+    avo:hasOnTimePerformance true ;
+    avo:hasFuelConsumption "2920.0"^^xsd:decimal ;
+    ti:hasObservationTime "2024-08-15T10:35:00Z"^^xsd:dateTime .
+
+ex:Metric_UA001_20240816 a avo:PerformanceMetric ;
+    ti:observedEntity ex:UA001 ;
+    ti:observedReferent ex:UA001_Op_20240816 ;
+    avo:hasPassengerCount 188 ;
+    avo:hasOnTimePerformance true ;
+    avo:hasFuelConsumption "2780.0"^^xsd:decimal ;
+    ti:hasObservationTime "2024-08-16T10:25:00Z"^^xsd:dateTime .
+
+#################################################################
+#    Maintenance Events
+#################################################################
+
+ex:Maintenance_N12345_20240813 a avo:MaintenanceEvent ;
+    avo:involvesAircraft ex:Aircraft_N12345 ;
+    avo:hasMaintenanceType "A-Check" ;
+    ti:hasObservationTime "2024-08-13T22:00:00Z"^^xsd:dateTime ;
+    rdfs:comment "Routine A-Check performed before flight" .
+
+ex:Maintenance_N67890_20240817 a avo:MaintenanceEvent ;
+    avo:involvesAircraft ex:Aircraft_N67890 ;
+    avo:hasMaintenanceType "Engine Inspection" ;
+    ti:hasObservationTime "2024-08-17T06:00:00Z"^^xsd:dateTime ;
+    rdfs:comment "Scheduled engine inspection" .
+
+#################################################################
+#    Safety Incident (for investigation example)
+#################################################################
+
+ex:Incident_20240814 a avo:SafetyIncident ;
+    avo:reportedFor ex:UA001_Op_20240814 ;
+    ti:observedEntity ex:UA001 ;
+    ti:observedReferent ex:UA001_Op_20240814 ;
+    avo:hasIncidentType "Turbulence" ;
+    avo:hasSeverity "Minor" ;
+    ti:hasObservationTime "2024-08-14T09:30:00Z"^^xsd:dateTime ;
+    rdfs:comment "Minor turbulence reported during flight" .
+
+#################################################################
+#    Linking Operations to Transitions
+#################################################################
+
+ex:UA001_Op_20240814 ti:hasTransition ex:Transition_20240814_to_20240815 .
+ex:UA001_Op_20240815 ti:hasTransition ex:Transition_20240814_to_20240815 ;
+                     ti:hasTransition ex:Transition_20240815_to_20240816 .
+ex:UA001_Op_20240816 ti:hasTransition ex:Transition_20240815_to_20240816 .
